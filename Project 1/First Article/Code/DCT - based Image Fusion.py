@@ -193,8 +193,8 @@ def fusion_dct(img_1, img_2, level, details, approx, display_decomposition_mosai
     def get_max_magnitude_pixel(A, B):
         # Ensure images are of the same shape
         assert A.shape == B.shape
-        A = A.astype(np.float32)
-        B = B.astype(np.float32)
+        A = A.astype(np.float64)
+        B = B.astype(np.float64)
         # Calculate the magnitude of each pixel in the images
         mag1 = np.abs(A)
         mag2 = np.abs(B)
@@ -213,8 +213,8 @@ def fusion_dct(img_1, img_2, level, details, approx, display_decomposition_mosai
     def get_min_magnitude_pixel(A, B):
         # Ensure images are of the same shape
         assert A.shape == B.shape
-        A = A.astype(np.float32)
-        B = B.astype(np.float32)
+        A = A.astype(np.float64)
+        B = B.astype(np.float64)
         # Calculate the magnitude of each pixel in the images
         mag1 = np.abs(A)
         mag2 = np.abs(B)
@@ -292,8 +292,8 @@ def fusion_dwt(img_1, img_2, level, wavelet, details, approx, display_decomposit
     def get_max_magnitude_pixel(A, B):
         # Ensure images are of the same shape
         assert A.shape == B.shape
-        A = A.astype(np.float32)
-        B = B.astype(np.float32)
+        A = A.astype(np.float64)
+        B = B.astype(np.float64)
         # Calculate the magnitude of each pixel in the images
         mag1 = np.abs(A)
         mag2 = np.abs(B)
@@ -312,8 +312,8 @@ def fusion_dwt(img_1, img_2, level, wavelet, details, approx, display_decomposit
     def get_min_magnitude_pixel(A, B):
         # Ensure images are of the same shape
         assert A.shape == B.shape
-        A = A.astype(np.float32)
-        B = B.astype(np.float32)
+        A = A.astype(np.float64)
+        B = B.astype(np.float64)
         # Calculate the magnitude of each pixel in the images
         mag1 = np.abs(A)
         mag2 = np.abs(B)
