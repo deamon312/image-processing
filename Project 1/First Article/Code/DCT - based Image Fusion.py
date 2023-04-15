@@ -555,7 +555,7 @@ def select_images_from_folder():
             image = cv2.imread(file_path)
             image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
             image = cv2.resize(image, (512, 512))
-            image = image.astype(np.float32)
+            image = image.astype(np.float64)
             images.append(image)
     enable_btn()
     return images
