@@ -30,7 +30,7 @@ def create_mosaic(images):
 
 
 ########################################## DCT #########################################################   
-def MRDCT(image, level=1):
+def MDCT(image, level=1):
     """
     Perform Multi Resolution DCT on an image
     
@@ -85,7 +85,7 @@ def MRDCT(image, level=1):
     return coeffs
 
 
-def IMRDCT(coeff):
+def IMDCT(coeff):
     """
     Perform Multi Resolution IDCT on a coeeficents
     
@@ -127,7 +127,7 @@ def IMRDCT(coeff):
 
 
 ########################################  Wavelets  ########################################################
-def MRWT(image, level, wavelet):
+def MDWT(image, level, wavelet):
     """
     Perform Multi Resolution DWT on an image
     
@@ -157,7 +157,7 @@ def MRWT(image, level, wavelet):
     return coeffs
 
 
-def IMRWT(coeff, wavelet):
+def IMDWT(coeff, wavelet):
     """
     Perform Multi Resolution IDWT on a coeeficents
     
@@ -235,8 +235,8 @@ def fusion_dct(img_1, img_2, level, details, approx, display_decomposition_mosai
             cv2.destroyAllWindows()
 
     coeff = []
-    coeffs_1 = MRDCT(img_1, level)
-    coeffs_2 = MRDCT(img_2, level)
+    coeffs_1 = MDCT(img_1, level)
+    coeffs_2 = MDCT(img_2, level)
     for i, val in enumerate(coeffs_1):  # Fusion
         if i % 4 == 0:
             if approx == 'min':
@@ -257,35 +257,35 @@ def fusion_dct(img_1, img_2, level, details, approx, display_decomposition_mosai
                 coeff.append(mean_coeff)
             else:
                 print("Invalid metric for details")
-    MRDCT1 = create_mosaic(coeffs_1)
-    MRDCT2 = create_mosaic(coeffs_2)
-    MRDCT_FUSION = create_mosaic(coeff)
-    IMRDCT_FUSION = IMRDCT(coeff)
+    MDCT1 = create_mosaic(coeffs_1)
+    MDCT2 = create_mosaic(coeffs_2)
+    MDCT_FUSION = create_mosaic(coeff)
+    IMDCT_FUSION = IMDCT(coeff)
 
     if display_decomposition_mosaic:
-        combined_i = cv2.hconcat([MRDCT1, MRDCT2])
+        combined_i = cv2.hconcat([MDCT1, MDCT2])
         cv2.putText(combined_i, 'IDCT_IMG1', (220, 480), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-        cv2.putText(combined_i, 'IDCT_IMG2', (MRDCT1.shape[1] + 220, 480), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+        cv2.putText(combined_i, 'IDCT_IMG2', (MDCT1.shape[1] + 220, 480), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
         cv2.imshow(f'Decomposition level: {level}', combined_i)
         cv2.setWindowProperty(f'Decomposition level: {level}', cv2.WND_PROP_TOPMOST, 1)
         # Associate the callback function with the named window
         cv2.setMouseCallback(f'Decomposition level: {level}', mouse_callback)
     if display_fusion_mosaic:
-        cv2.putText(MRDCT_FUSION, f'Approx: {approx} Details: {details}', (165, 500), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-        cv2.imshow(f'Decomposition of Fusion ,level: {level}', MRDCT_FUSION)
+        cv2.putText(MDCT_FUSION, f'Approx: {approx} Details: {details}', (165, 500), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+        cv2.imshow(f'Decomposition of Fusion ,level: {level}', MDCT_FUSION)
         cv2.setWindowProperty(f'Decomposition of Fusion ,level: {level}', cv2.WND_PROP_TOPMOST, 1)
         # Associate the callback function with the named window
         cv2.setMouseCallback(f'Decomposition of Fusion ,level: {level}', mouse_callback)
     if display_fusion:
-        cv2.putText(IMRDCT_FUSION, f'Approx: {approx} Details: {details}', (165, 500), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
-        cv2.imshow('Fusion', IMRDCT_FUSION.copy() / 255.)
+        cv2.putText(IMDCT_FUSION, f'Approx: {approx} Details: {details}', (165, 500), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
+        cv2.imshow('Fusion', IMDCT_FUSION.copy() / 255.)
         cv2.setWindowProperty('Fusion', cv2.WND_PROP_TOPMOST, 1)
         # Associate the callback function with the named window
         cv2.setMouseCallback('Fusion', mouse_callback)
     if not err:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-    return IMRDCT(coeff), coeff, MRDCT1, MRDCT2, create_mosaic(coeff)
+    return IMDCT(coeff), coeff, MDCT1, MDCT2, create_mosaic(coeff)
 
 
 def fusion_dwt(img_1, img_2, level, wavelet, details, approx, display_decomposition_mosaic=False, display_fusion_mosaic=False, display_fusion=False, err=False):
@@ -334,8 +334,8 @@ def fusion_dwt(img_1, img_2, level, wavelet, details, approx, display_decomposit
             cv2.destroyAllWindows()
 
     coeff = []
-    coeffs_1 = MRWT(img_1, level, wavelet)
-    coeffs_2 = MRWT(img_2, level, wavelet)
+    coeffs_1 = MDWT(img_1, level, wavelet)
+    coeffs_2 = MDWT(img_2, level, wavelet)
     for i, val in enumerate(coeffs_1):
         if i % 4 == 0:
             if approx == 'min':
@@ -357,33 +357,33 @@ def fusion_dwt(img_1, img_2, level, wavelet, details, approx, display_decomposit
                 coeff.append(mean_coeff)
             else:
                 print("Invalid metric for details")
-    MRWT1 = create_mosaic(coeffs_1)
-    MRWT2 = create_mosaic(coeffs_2)
-    MRWT_FUSION = create_mosaic(coeff)
-    IMRWT_FUSION = IMRWT(coeff, wavelet)
+    MDWT1 = create_mosaic(coeffs_1)
+    MDWT2 = create_mosaic(coeffs_2)
+    MDWT_FUSION = create_mosaic(coeff)
+    IMDWT_FUSION = IMDWT(coeff, wavelet)
     if display_decomposition_mosaic:
-        combined_i = cv2.hconcat([MRWT1, MRWT2])
+        combined_i = cv2.hconcat([MDWT1, MDWT2])
         cv2.putText(combined_i, 'IDWT_IMG1', (220, 480), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-        cv2.putText(combined_i, 'IDWT_IMG2', (MRWT1.shape[1] + 220, 480), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+        cv2.putText(combined_i, 'IDWT_IMG2', (MDWT1.shape[1] + 220, 480), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
         cv2.imshow(f'Decomposition level: {level}', combined_i)
         cv2.setWindowProperty(f'Decomposition level: {level}', cv2.WND_PROP_TOPMOST, 1)
         cv2.setMouseCallback(f'Decomposition level: {level}', mouse_callback)
     if display_fusion_mosaic:
-        cv2.putText(MRWT_FUSION, f'Mother Wavelet: {wavelet} Approx: {approx} Details: {details}', (70, 500), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-        cv2.imshow(f'Decomposition of Fusion ,level: {level}', MRWT_FUSION)
+        cv2.putText(MDWT_FUSION, f'Mother Wavelet: {wavelet} Approx: {approx} Details: {details}', (70, 500), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+        cv2.imshow(f'Decomposition of Fusion ,level: {level}', MDWT_FUSION)
         cv2.setWindowProperty(f'Decomposition of Fusion ,level: {level}', cv2.WND_PROP_TOPMOST, 1)
         # Associate the callback function with the named window
         cv2.setMouseCallback(f'Decomposition of Fusion ,level: {level}', mouse_callback)
     if display_fusion:
-        cv2.putText(IMRWT_FUSION, f'Approx: {approx} Details: {details}', (165, 500), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
-        cv2.imshow('Fusion', IMRWT_FUSION / 255.)
+        cv2.putText(IMDWT_FUSION, f'Approx: {approx} Details: {details}', (165, 500), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
+        cv2.imshow('Fusion', IMDWT_FUSION / 255.)
         cv2.setWindowProperty('Fusion', cv2.WND_PROP_TOPMOST, 1)
         # Associate the callback function with the named window
         cv2.setMouseCallback('Fusion', mouse_callback)
     if not err:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-    return IMRWT(coeff, wavelet), coeff, MRWT1, MRWT2, create_mosaic(coeff)
+    return IMDWT(coeff, wavelet), coeff, MDWT1, MDWT2, create_mosaic(coeff)
 
 
 # metrics 
