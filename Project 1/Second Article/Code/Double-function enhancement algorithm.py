@@ -21,8 +21,9 @@ def disp_img(img , title = 'img' ,text = {'text' : [None],'loc':[(165,500)]}):
         else:  
             cv2.putText(I, val, text['loc'][i], cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1) 
 
-    cv2.imshow(title ,I)
+    cv2.namedWindow(title, cv2.WINDOW_NORMAL) 
     cv2.setWindowProperty(title, cv2.WND_PROP_TOPMOST, 1)
+    cv2.imshow(title ,I)
     # Associate the callback function with the named window
     cv2.setMouseCallback(title, mouse_callback)
 
