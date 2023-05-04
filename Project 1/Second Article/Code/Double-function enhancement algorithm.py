@@ -412,7 +412,6 @@ def CLAHE(Img):
 
 ################################### Adaptive histogram equalization ##################################
 def AHE(Img):
-    I = cv2.cvtColor(Img, cv2.COLOR_BGR2RGB)
     eq = exposure.equalize_adapthist(Img)
     return cv2.normalize(eq, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8UC3)
     
@@ -577,7 +576,7 @@ class ImageProcessorGUI:
         self.master = master
         master.title("Image Processor")
         w = 380
-        h = 350
+        h = 370
         # open window in the center of screen
         screen_width = master.winfo_screenwidth()  # get the screen width
         screen_height = master.winfo_screenheight()  # get the screen height
@@ -646,7 +645,7 @@ class ImageProcessorGUI:
         self.metric_table = ttk.Frame(master)
         self.metric_table.grid(row=6, column=0, padx=5)
         self.metric_table_label = ttk.Label(self.metric_table, text="Metric Table")
-        self.metric_table_label.grid(row=7, column=0, pady=(0, 1))
+        self.metric_table_label.grid(row=7, column=0, pady=(5, 5))
 
         self.metric_table_treeview = ttk.Treeview(self.metric_table, height=5)
         self.metric_table_treeview.grid(row=8, column=0)
@@ -665,7 +664,7 @@ class ImageProcessorGUI:
 
         # Run button
         self.run_button = tk.Button(self.checkbox_frame, text="Run",state='disabled', command=self.run)
-        self.run_button.grid(row=7, column=0, padx=10, pady=10 )
+        self.run_button.grid(row=7, column=0, padx=10, pady=5 )
 
           
     
@@ -674,7 +673,7 @@ class ImageProcessorGUI:
         if self.model_combobox.get() == 'MSRCR':
            self.values_entry_sigma.configure(state='normal')
            self.values_entry_sigma.delete(0,'end')
-           self.values_entry_sigma.insert(1,'30,100,300')
+           self.values_entry_sigma.insert(1,'10,100,300')
            self.values_entry_weight.configure(state='disable')
            self.values_entry_kernel.configure(state='disable')
            self.values_entry_lambda.configure(state='disable')
@@ -687,10 +686,10 @@ class ImageProcessorGUI:
         elif  self.model_combobox.get() == 'DFE': 
            self.values_entry_sigma.configure(state='normal')
            self.values_entry_sigma.delete(0,'end')
-           self.values_entry_sigma.insert(1,'30,100,300')
+           self.values_entry_sigma.insert(1,'10,100,300')
            self.values_entry_weight.configure(state='normal')
            self.values_entry_weight.delete(0,'end')
-           self.values_entry_weight.insert(1,'0.01,0.01,0.25')
+           self.values_entry_weight.insert(1,'0.05,0.15,0.25')
            self.values_entry_kernel.configure(state='normal')
            self.values_entry_kernel.delete(0,'end')
            self.values_entry_kernel.insert(1,'9,9')
@@ -749,13 +748,12 @@ class ImageProcessorGUI:
            sigma = [int(num)for num in self.values_entry_sigma.get().split(',')]
            weights = [float(num)for num in self.values_entry_weight.get().split(',')]
            kernel = [int(num)for num in self.values_entry_kernel.get().split(',')]
-           lam = int(self.values_entry_lambda.get())
+           lam = float(self.values_entry_lambda.get())
         elif model == 'MSRCR': 
            sigma = [int(num)for num in self.values_entry_sigma.get().split(',')] 
         
         
         checkboxes = [var.get() for var in self.checkbox_vars]
-        print(checkboxes)
 
         # Display processed image
         self.info = Model(Img ,model =model ,disp_selector = checkboxes,sigma = sigma,weights=weights ,kernel =kernel ,lam = lam)
