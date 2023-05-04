@@ -689,7 +689,7 @@ class ImageProcessorGUI:
            self.values_entry_sigma.insert(1,'10,100,300')
            self.values_entry_weight.configure(state='normal')
            self.values_entry_weight.delete(0,'end')
-           self.values_entry_weight.insert(1,'0.05,0.15,0.25')
+           self.values_entry_weight.insert(1,'0.05,0.1,0.25')
            self.values_entry_kernel.configure(state='normal')
            self.values_entry_kernel.delete(0,'end')
            self.values_entry_kernel.insert(1,'9,9')
