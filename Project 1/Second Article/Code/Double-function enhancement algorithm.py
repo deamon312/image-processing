@@ -511,7 +511,7 @@ def Model(Img ,model = 'DFE' ,disp_selector = [False,False,False,False,False ,Fa
          I_img = ((I_out/255.*I_p/255.)*255).astype(np.uint8)
 
          ######################### S - Channel #########################
-         I_u= denoise_tv(s, weight=1/40, eps=1e-6, max_num_iter=100)
+         I_u= denoise_tv(s, weight=1/lam, eps=1e-6, max_num_iter=100)
          S_tag = exposure.equalize_adapthist(I_u/255.)
          S_tag = cv2.normalize(S_tag, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8UC3)
          
