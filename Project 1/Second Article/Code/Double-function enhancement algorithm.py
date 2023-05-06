@@ -21,9 +21,9 @@ def disp_img(img , title = 'img' ,text = {'text' : [None],'loc':[(165,500)]}):
         else:  
             cv2.putText(I, val, text['loc'][i], cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1) 
 
-    cv2.namedWindow(title, cv2.WINDOW_NORMAL) 
-    cv2.setWindowProperty(title, cv2.WND_PROP_TOPMOST, 1)
     cv2.imshow(title ,I)
+    cv2.setWindowProperty(title, cv2.WND_PROP_TOPMOST, 1)
+
     # Associate the callback function with the named window
     cv2.setMouseCallback(title, mouse_callback)
 
@@ -412,7 +412,6 @@ def CLAHE(Img):
 
 ################################### Adaptive histogram equalization ##################################
 def AHE(Img):
-    I = cv2.cvtColor(Img, cv2.COLOR_BGR2RGB)
     eq = exposure.equalize_adapthist(Img)
     return cv2.normalize(eq, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8UC3)
     
@@ -497,22 +496,22 @@ def metric(I_ref ,I_enc):
     return info_ref
 
 
-def Model(Img ,model = 'DFE' ,disp_selector = [False ,False,False ,False,False ,False, False ,False]
+def Model(Img ,model = 'DFE' ,disp_selector = [False,False,False,False,False ,False,False ,False, False ,False]
            ,sigma = [10,40,400],weights=[0.05,0.05,0.2], kernel = [9,9],lam = 40):
     
-      if model == 'DFE':
+    if model == 'DFE':
          # disp_selector = [Original , Original & I_o,  HSV ,I_d,I_p,I_out,I_img,I_u,S_tag ]
          h,s,v = BGRtoHSV(Img) 
          n , m = kernel
          ######################### V - Channel #########################
-         I_u_V= denoise_tv(v, weight =1/lam, eps=1e-6, max_num_iter=100)
-         I_d = adaptive_gamma_transform(I_u_V,n=3,m=3)
+         I_v= denoise_tv(v, weight =1/lam, eps=1e-6, max_num_iter=100)
+         I_d = adaptive_gamma_transform(I_v,n=3,m=3)
          I_p = DFIE(I_d , sigma,n ,m )
          I_out = three_dim_gamma_correction(I_d,weights,n,m)
          I_img = ((I_out/255.*I_p/255.)*255).astype(np.uint8)
 
          ######################### S - Channel #########################
-         I_u= denoise_tv(s, weight=1/40, eps=1e-6, max_num_iter=100)
+         I_u= denoise_tv(s, weight=1/lam, eps=1e-6, max_num_iter=100)
          S_tag = exposure.equalize_adapthist(I_u/255.)
          S_tag = cv2.normalize(S_tag, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8UC3)
          
@@ -522,45 +521,53 @@ def Model(Img ,model = 'DFE' ,disp_selector = [False ,False,False ,False,False ,
          I_o_cb = color_balance(I_o,1,1)
          performance = metric(Img,I_o)
          if disp_selector[0]:
-            disp_img(np.block([[Img],[I_o],[I_o_cb]]) , title = 'Enhancement' ,text = {'text' : ['Original','Enhancement','Enhancement + Color Balance'],'loc':[(280,460),(640+280,460),(640*2+230,460)]})     
+            disp_img(I_o, title = 'I_o' ,text = {'text' : ['I_o'],'loc':[(280,460)]})
          if disp_selector[1]:
-            disp_img(np.block([h,s,v]) , title = 'HSV' ,text = {'text' : ['h-channel','s-channel','v-channel'],'loc':[(280,460),(640+280,460),(640*2+280,460)]})  
+            disp_img(np.block([[Img],[I_o],[I_o_cb]]) , title = 'Enhancement' ,text = {'text' : ['Original','Enhancement','Enhancement + Color Balance'],'loc':[(280,460),(640+280,460),(640*2+230,460)]})     
          if disp_selector[2]:
-            disp_img(I_d, title = 'I_d' ,text = {'text' : ['I_d'],'loc':[(280,460)]})
+            disp_img(np.block([h,s,v]) , title = 'HSV' ,text = {'text' : ['h-channel','s-channel','v-channel'],'loc':[(280,460),(640+280,460),(640*2+280,460)]})  
          if disp_selector[3]:
-            disp_img(I_p, title = 'I_p' ,text = {'text' : ['I_p'],'loc':[(280,460)]})
+            disp_img(I_d, title = 'I_d' ,text = {'text' : ['I_d'],'loc':[(280,460)]})
          if disp_selector[4]:
-            disp_img(I_out, title = 'I_out' ,text = {'text' : ['I_out'],'loc':[(280,460)]})
+            disp_img(I_p, title = 'I_p' ,text = {'text' : ['I_p'],'loc':[(280,460)]})
          if disp_selector[5]:
-            disp_img(I_img, title = 'I_img' ,text = {'text' : ['I_img'],'loc':[(280,460)]})
+            disp_img(I_out, title = 'I_out' ,text = {'text' : ['I_out'],'loc':[(280,460)]})
          if disp_selector[6]:
-            disp_img(I_u, title = 'I_u' ,text = {'text' : ['I_u'],'loc':[(280,460)]})
+            disp_img(I_img, title = 'I_img' ,text = {'text' : ['I_img'],'loc':[(280,460)]})
          if disp_selector[7]:
+            disp_img(I_u, title = 'I_u' ,text = {'text' : ['I_u'],'loc':[(280,460)]})
+         if disp_selector[8]:
+            disp_img(I_v, title = 'I_v' ,text = {'text' : ['I_v'],'loc':[(280,460)]})
+         if disp_selector[9]:
             disp_img(S_tag, title = 'S_tag' ,text = {'text' : ['S_tag'],'loc':[(280,460)]})
          return  performance
-      if model == 'MSRCR':
+    if model == 'MSRCR':
          I_o = msrcr(Img,sigma_scales=sigma) 
          performance = metric(Img,I_o)
          if disp_selector[0]:
+            disp_img(I_o, title = 'I_o' ,text = {'text' : ['I_o'],'loc':[(280,460)]})
+         if disp_selector[1]:
             disp_img(np.block([[Img],[I_o]]) , title = 'Enhancement' ,text = {'text' : ['Original','Enhancement'],'loc':[(280,460),(640+280,460)]})
 
          return  performance    
-      if model == 'CLAHE':
+    if model == 'CLAHE':
          I_o = CLAHE(Img) 
          performance = metric(Img,I_o)
-
          if disp_selector[0]:
+            disp_img(I_o, title = 'I_o' ,text = {'text' : ['I_o'],'loc':[(280,460)]})
+         if disp_selector[1]:
             disp_img(np.block([[Img],[I_o]]) , title = 'Enhancement' ,text = {'text' : ['Original','Enhancement'],'loc':[(280,460),(640+280,460)]})  
 
          return  performance            
-      if model == 'AHE':
+    if model == 'AHE':
          I_o = AHE(Img)
          performance = metric(Img,I_o) 
-
          if disp_selector[0]:
+            disp_img(I_o, title = 'I_o' ,text = {'text' : ['I_o'],'loc':[(280,460)]})
+         if disp_selector[1]:
             disp_img(np.block([[Img],[I_o]]) , title = 'Enhancement' ,text = {'text' : ['Original','Enhancement'],'loc':[(280,460),(640+280,460)]}) 
  
-         return  performance         
+         return  performance   
              
 
 class ImageProcessorGUI:
@@ -569,7 +576,7 @@ class ImageProcessorGUI:
         self.master = master
         master.title("Image Processor")
         w = 380
-        h = 350
+        h = 370
         # open window in the center of screen
         screen_width = master.winfo_screenwidth()  # get the screen width
         screen_height = master.winfo_screenheight()  # get the screen height
@@ -624,7 +631,7 @@ class ImageProcessorGUI:
         self.checkbox_frame = tk.Frame(master)
         self.checkbox_frame.grid(row=6, column=1, padx=10)
        
-        self.checkbox_labels = ['I_o', 'HSV', 'I_d', 'I_p', 'I_out', 'I_img', 'I_u', 'S']
+        self.checkbox_labels = ['I_o','I_i&o','HSV', 'I_d', 'I_p', 'I_out', 'I_img', 'I_u','I_v', "S'"]
         self.checkbox_vars = [tk.BooleanVar() for i in range(len(self.checkbox_labels))]
         self.checkbox_buttons = []
         
@@ -638,7 +645,7 @@ class ImageProcessorGUI:
         self.metric_table = ttk.Frame(master)
         self.metric_table.grid(row=6, column=0, padx=5)
         self.metric_table_label = ttk.Label(self.metric_table, text="Metric Table")
-        self.metric_table_label.grid(row=7, column=0, pady=(0, 1))
+        self.metric_table_label.grid(row=7, column=0, pady=(5, 5))
 
         self.metric_table_treeview = ttk.Treeview(self.metric_table, height=5)
         self.metric_table_treeview.grid(row=8, column=0)
@@ -657,7 +664,7 @@ class ImageProcessorGUI:
 
         # Run button
         self.run_button = tk.Button(self.checkbox_frame, text="Run",state='disabled', command=self.run)
-        self.run_button.grid(row=7, column=0, padx=10, pady=10 )
+        self.run_button.grid(row=7, column=0, padx=10, pady=5 )
 
           
     
@@ -666,7 +673,7 @@ class ImageProcessorGUI:
         if self.model_combobox.get() == 'MSRCR':
            self.values_entry_sigma.configure(state='normal')
            self.values_entry_sigma.delete(0,'end')
-           self.values_entry_sigma.insert(1,'30,100,300')
+           self.values_entry_sigma.insert(1,'10,100,300')
            self.values_entry_weight.configure(state='disable')
            self.values_entry_kernel.configure(state='disable')
            self.values_entry_lambda.configure(state='disable')
@@ -674,14 +681,15 @@ class ImageProcessorGUI:
                self.checkbox_buttons[i].configure(state='disable')
                self.checkbox_buttons[i].deselect()
            self.checkbox_buttons[0].configure(state='normal')
+           self.checkbox_buttons[1].configure(state='normal')
 
         elif  self.model_combobox.get() == 'DFE': 
            self.values_entry_sigma.configure(state='normal')
            self.values_entry_sigma.delete(0,'end')
-           self.values_entry_sigma.insert(1,'30,100,300')
+           self.values_entry_sigma.insert(1,'10,100,300')
            self.values_entry_weight.configure(state='normal')
            self.values_entry_weight.delete(0,'end')
-           self.values_entry_weight.insert(1,'0.01,0.01,0.25')
+           self.values_entry_weight.insert(1,'0.05,0.1,0.25')
            self.values_entry_kernel.configure(state='normal')
            self.values_entry_kernel.delete(0,'end')
            self.values_entry_kernel.insert(1,'9,9')
@@ -700,6 +708,7 @@ class ImageProcessorGUI:
                self.checkbox_buttons[i].configure(state='disable')
                self.checkbox_buttons[i].deselect()
            self.checkbox_buttons[0].configure(state='normal')
+           self.checkbox_buttons[1].configure(state='normal')
 
         for i in self.metric_table_treeview.get_children():
               self.metric_table_treeview.delete(i)         
@@ -730,7 +739,7 @@ class ImageProcessorGUI:
         # Get values from GUI elements
         sigma =  None
         weights = None
-        kernel = None  
+        kernel = None 
         lam = None
         Img = self.image
         model = self.model_combobox.get()
@@ -739,7 +748,7 @@ class ImageProcessorGUI:
            sigma = [int(num)for num in self.values_entry_sigma.get().split(',')]
            weights = [float(num)for num in self.values_entry_weight.get().split(',')]
            kernel = [int(num)for num in self.values_entry_kernel.get().split(',')]
-           lam = int(self.values_entry_lambda.get())
+           lam = float(self.values_entry_lambda.get())
         elif model == 'MSRCR': 
            sigma = [int(num)for num in self.values_entry_sigma.get().split(',')] 
         
@@ -753,8 +762,8 @@ class ImageProcessorGUI:
         cv2.destroyAllWindows()
 
         
-#if __name__ == '__main__':
-root = tk.Tk()
-
-gui = ImageProcessorGUI(root)
-root.mainloop()
+if __name__ == '__main__':
+    root = tk.Tk()
+    
+    gui = ImageProcessorGUI(root)
+    root.mainloop()
