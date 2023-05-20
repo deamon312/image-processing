@@ -15,7 +15,7 @@ p=0.95;
 w=0.95;
 t0=0.25;
 beta=0.01;
-radius = 3;
+radius = 15;
 omega(1:2) = 15;
 
 %%
@@ -41,8 +41,7 @@ fprintf('V_R finished');
 A  = min([estimateAtmosphericLight(W), max(max(255-W))]);
 % t=zeros(height,width);
 t=ones(height,width)-w*V_R/A;
-t_depth=-log(t)./beta;
-figure,imshow(uint8(t_depth)),title('depth image t');
+figure,imshow(t),title('depth image t');
 
 image_double=double(image);
 J=zeros(size(image));
