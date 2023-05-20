@@ -1,24 +1,45 @@
-function [ out ] = bilat_filter_joint( in,D,radius,sigma_s,sigma_r )
+function output_image = bilat_filter_joint(input_image, guidance_image,radius, sigma_s, sigma_r, sigma_t)
 
-[X,Y]=meshgrid(-radius:radius,-radius:radius);
-G = exp(-(X.^2+Y.^2)/(2*sigma_s^2));  
-sz=size(in);
-out=zeros(sz);
-for i=1:sz(1)
-    for j=1:sz(2)
-        imin=max(i-radius,1);
-        imax=min(i+radius,sz(1));
-        jmin=max(j-radius,1);
-        jmax=min(j+radius,sz(2));
-        
-        D_1=D(imin:imax,jmin:jmax);
-        in_1=in(imin:imax,jmin:jmax);
-        
-        H=exp(-(D_1-D(i,j)).^2/2/sigma_r^2);
-        
-        F = H.*G((imin:imax)-i+radius+1,(jmin:jmax)-j+radius+1);  
-        out(i,j) = sum(F(:).*in_1(:))/sum(F(:)); 
+    [X,Y]=meshgrid(-radius:radius,-radius:radius);
+    spatial_weights = exp(-(X.^2+Y.^2)/(2*sigma_s^2)); 
+
+    % Create waitbar.
+    h = waitbar(0,'Wait ,Applying joint bilateral filter...');
+    set(h,'Name','Joint Bilateral Fiter Processing');
+    
+    % Compute the size of the input and guidance images
+    [rows, cols] = size(input_image);
+    
+    % Initialize the output image
+    output_image = zeros(size(input_image));
+    
+    % Apply the improved joint bilateral filter
+    for i = 1:rows
+        for j = 1:cols
+            % Compute the local region boundaries
+            row_min = max(i - radius, 1);
+            row_max = min(i + radius, rows);
+            col_min = max(j - radius, 1);
+            col_max = min(j + radius, cols);
+            
+            % Extract the local region of the input and guidance images
+            local_input = input_image(row_min:row_max, col_min:col_max);
+            local_guidance = guidance_image(row_min:row_max, col_min:col_max);
+            
+            % Compute the range weights
+            range_weights = exp(-(local_input-input_image(i, j)).^2 / (2 * sigma_r^2));
+              
+            % Compute the temporal weights
+            temporal_weights = exp(-(local_guidance-guidance_image(i, j)).^2 / (2 * sigma_t^2));
+            
+            % Compute the combined weights
+            weights =  spatial_weights((row_min:row_max)-i+radius+1,(col_min:col_max)-j+radius+1).*range_weights.*temporal_weights;
+            
+            % Apply the weighted average to filter the input image
+            output_image(i, j) = sum(weights(:).*local_input(:)) / sum(weights(:));
+        end
+        waitbar(i/rows);
     end
+   % Close waitbar.
+   close(h);
 end
-end
-
