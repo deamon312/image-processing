@@ -1,4 +1,4 @@
-%%
+ %%
 clear all;
 close all;
 clc;
@@ -39,14 +39,20 @@ figure,imshow(uint8(V_R)),title('V_r');
 fprintf('V_R finished');
 %%
 A  = min([estimateAtmosphericLight(W), max(max(255-W))]);
-% t=zeros(height,width);
 t=ones(height,width)-w*V_R/A;
 figure,imshow(t),title('depth image t');
-
+%%
 image_double=double(image);
 J=zeros(size(image));
 J(:,:,1)=(image_double(:,:,1)-A)./max(t,t0)+A;
 J(:,:,2)=(image_double(:,:,2)-A)./max(t,t0)+A;
 J(:,:,3)=(image_double(:,:,3)-A)./max(t,t0)+A;
 figure,imshow(uint8(J)),title('J');
-% imwrite(J,'fog2_out.jpg','jpg');
+
+%%
+LAB = rgb2lab(uint8(J)); 
+L = LAB(:,:,1)/100;
+L = adapthisteq(L,'NumTiles',[5 5],'ClipLimit',0.01,'Distribution','rayleigh');
+LAB(:,:,1) = L*100;
+J_adapt = lab2rgb(LAB);
+figure,imshow(J_adapt),title('RJ_adaptEQ');
