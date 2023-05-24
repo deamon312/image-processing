@@ -1,5 +1,5 @@
 function [output_image ] = bilat_filter(input_image,radius,sigma_s,sigma_r )
-
+    % Compute the spatial weights
     [X,Y]=meshgrid(-radius:radius,-radius:radius);
     spatial_weights = exp(-(X.^2+Y.^2)/(2*sigma_s^2)); 
 
