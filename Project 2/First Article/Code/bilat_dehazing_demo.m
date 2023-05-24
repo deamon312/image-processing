@@ -7,7 +7,7 @@ selectedfile = fullfile(path,file);
 image=imread(selectedfile);
 figure,imshow(image),title('original');
 [height, width, ~] = size(image);
-%%
+%% Parameters
 sigma_s=0.03*min(height,width);
 sigma_r=20;
 sigma_t=20;
@@ -52,7 +52,7 @@ figure,imshow(uint8(J)),title('J');
 %%
 LAB = rgb2lab(uint8(J)); 
 L = LAB(:,:,1)/100;
-L = adapthisteq(L,'NumTiles',[5 5],'ClipLimit',0.01,'Distribution','rayleigh');
+L = adapthisteq(L,'NumTiles',[8 8],'ClipLimit',0.005,'Distribution','rayleigh');
 LAB(:,:,1) = L*100;
 J_adapt = lab2rgb(LAB);
 figure,imshow(J_adapt),title('RJ_adaptEQ');
