@@ -1,4 +1,4 @@
-function H = gausshp(I, gL, gH, D0, C)
+function H = gaushp(I, gL, gH, D0, C)
 %gL     - low values
 %gH     - high values
 %D0     - size of the gaussian, affects more/less frequencies
@@ -10,7 +10,7 @@ function H = gausshp(I, gL, gH, D0, C)
     [M,N] = size(I);
     % Generate a meshgrid for the frequency domain
     [X, Y] = meshgrid(1:N,1:M);
-    gaussianNumerator = sqrt((X -  floor(N/2)).^2 + (Y - floor(M/2)).^2);
-    H = (gH-gL)*(1-exp(-C*gaussianNumerator.^2./(D0.^2)))+gL;
+    gaussianNumerator = (X -  floor(N/2)).^2 + (Y - floor(M/2)).^2;
+    H = (gH-gL)*(1-exp(-C*gaussianNumerator./(D0.^2)))+gL;
 end
 

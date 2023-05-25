@@ -6,8 +6,8 @@ function H = idealhp(I, cutoff)
     [M,N] = size(I);
     % Generate a meshgrid for the frequency domain
     [X, Y] = meshgrid(1:N,1:M);
-    D = sqrt((X -  floor(N/2)).^2 + (Y - floor(M/2)).^2);
+    D = ((X -  floor(N/2)).^2 + (Y - floor(M/2)).^2);
 
     % Create the ideal high-pass filter
-    H = double(D > cutoff);
+    H = double(D >= cutoff);
 end

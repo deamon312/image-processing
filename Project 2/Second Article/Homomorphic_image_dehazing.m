@@ -13,16 +13,16 @@ I_mean = im2double(I_mean);
 %% Filter
 gL = 0.3;
 gH = 1.8;
-C = 1;
-D0 = 1;
+C = 10;
+D0 = 8;
 tic
-H= gausshp(I_mean, gL, gH, D0, C);
+H= gaushp(I_mean, gL, gH, D0, C);
 toc
 figure,imshow(H,[]),title('H');
 
 %%
-D0=1;
-n=10;
+D0=2;
+n=100;
 tic
 H=butterhp(I_mean, D0,n);
 toc
