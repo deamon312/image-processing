@@ -5,6 +5,7 @@ function [out]=butterhp(I, D0,n)
 %n     - filter order value
 
     [M,N] = size(I);
+    % Generate a meshgrid for the frequency domain
     [X, Y] = meshgrid(1:N,1:M);
     D = sqrt((X -  floor(N/2)).^2 + (Y - floor(M/2)).^2);
     out=1./(1.+(D0./D).^(2*n));
