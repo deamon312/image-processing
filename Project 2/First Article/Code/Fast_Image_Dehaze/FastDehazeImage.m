@@ -1,38 +1,39 @@
-classdef FastDehazeImage_exported < matlab.apps.AppBase
+classdef FastDehazeImage < matlab.apps.AppBase
 
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure              matlab.ui.Figure
         GridLayout            matlab.ui.container.GridLayout
         LeftPanel             matlab.ui.container.Panel
-        SelectImageButton     matlab.ui.control.Button
-        KernelSpinnerLabel    matlab.ui.control.Label
-        KernelSpinner         matlab.ui.control.Spinner
-        OmegaSpinnerLabel     matlab.ui.control.Label
-        OmegaSpinner          matlab.ui.control.Spinner
-        wEditFieldLabel       matlab.ui.control.Label
-        wEditField            matlab.ui.control.NumericEditField
-        pEditFieldLabel       matlab.ui.control.Label
-        pEditField            matlab.ui.control.NumericEditField
-        WSwitchLabel          matlab.ui.control.Label
-        WSwitch               matlab.ui.control.Switch
-        VSwitchLabel          matlab.ui.control.Label
-        VSwitch               matlab.ui.control.Switch
-        V_RSwitchLabel        matlab.ui.control.Label
-        V_RSwitch             matlab.ui.control.Switch
-        RunButton             matlab.ui.control.Button
-        Sigma_tSliderLabel    matlab.ui.control.Label
-        Sigma_t               matlab.ui.control.Slider
-        Sigma_rSlider_2Label  matlab.ui.control.Label
-        Sigma_r               matlab.ui.control.Slider
-        RSwitchLabel          matlab.ui.control.Label
-        RSwitch               matlab.ui.control.Switch
-        tSwitchLabel          matlab.ui.control.Label
-        tSwitch               matlab.ui.control.Switch
-        Adapt_EQSwitchLabel   matlab.ui.control.Label
-        Adapt_EQSwitch        matlab.ui.control.Switch
-        JSwitchLabel          matlab.ui.control.Label
+        Image                 matlab.ui.control.Image
         JSwitch               matlab.ui.control.Switch
+        JSwitchLabel          matlab.ui.control.Label
+        Adapt_EQSwitch        matlab.ui.control.Switch
+        Adapt_EQSwitchLabel   matlab.ui.control.Label
+        tSwitch               matlab.ui.control.Switch
+        tSwitchLabel          matlab.ui.control.Label
+        RSwitch               matlab.ui.control.Switch
+        RSwitchLabel          matlab.ui.control.Label
+        Sigma_r               matlab.ui.control.Slider
+        Sigma_rSlider_2Label  matlab.ui.control.Label
+        Sigma_t               matlab.ui.control.Slider
+        Sigma_tSliderLabel    matlab.ui.control.Label
+        RunButton             matlab.ui.control.Button
+        V_RSwitch             matlab.ui.control.Switch
+        V_RSwitchLabel        matlab.ui.control.Label
+        VSwitch               matlab.ui.control.Switch
+        VSwitchLabel          matlab.ui.control.Label
+        WSwitch               matlab.ui.control.Switch
+        WSwitchLabel          matlab.ui.control.Label
+        pEditField            matlab.ui.control.NumericEditField
+        pEditFieldLabel       matlab.ui.control.Label
+        wEditField            matlab.ui.control.NumericEditField
+        wEditFieldLabel       matlab.ui.control.Label
+        OmegaSpinner          matlab.ui.control.Spinner
+        OmegaSpinnerLabel     matlab.ui.control.Label
+        KernelSpinner         matlab.ui.control.Spinner
+        KernelSpinnerLabel    matlab.ui.control.Label
+        SelectImageButton     matlab.ui.control.Button
         RightPanel            matlab.ui.container.Panel
         UIAxes_2              matlab.ui.control.UIAxes
         UIAxes                matlab.ui.control.UIAxes
@@ -147,7 +148,7 @@ classdef FastDehazeImage_exported < matlab.apps.AppBase
             app.imageJ(:,:,3)=(image_double(:,:,3)-A)./max(app.imaget,t0)+A;
     
             imshow(uint8(app.imageJ), 'Parent', app.UIAxes_2);
-            [height, width, ~] = size(app.imageJ);
+            [height, width, ~] = size(app.imageData);
             app.UIAxes_2.XLim = [0 width];
             app.UIAxes_2.YLim = [0 height];
             if strcmp(app.JSwitch.Value,'On')
@@ -192,10 +193,13 @@ classdef FastDehazeImage_exported < matlab.apps.AppBase
         % Create UIFigure and components
         function createComponents(app)
 
+            % Get the file path for locating images
+            pathToMLAPP = fileparts(mfilename('fullpath'));
+
             % Create UIFigure and hide until all components are created
             app.UIFigure = uifigure('Visible', 'off');
             app.UIFigure.AutoResizeChildren = 'off';
-            app.UIFigure.Position = [100 100 650 516];
+            app.UIFigure.Position = [100 100 633 516];
             app.UIFigure.Name = 'MATLAB App';
             app.UIFigure.SizeChangedFcn = createCallbackFcn(app, @updateAppLayout, true);
 
@@ -407,22 +411,15 @@ classdef FastDehazeImage_exported < matlab.apps.AppBase
             app.JSwitch.Enable = 'off';
             app.JSwitch.Position = [197 179 20 45];
 
+            % Create Image
+            app.Image = uiimage(app.LeftPanel);
+            app.Image.Position = [8 1 232 41];
+            app.Image.ImageSource = fullfile(pathToMLAPP, '2023-05-24_22h40_17.png');
+
             % Create RightPanel
             app.RightPanel = uipanel(app.GridLayout);
             app.RightPanel.Layout.Row = 1;
             app.RightPanel.Layout.Column = 2;
-
-            % Create UIAxes_2
-            app.UIAxes_2 = uiaxes(app.RightPanel);
-            title(app.UIAxes_2, 'Dehazed (J)')
-            app.UIAxes_2.XColor = 'none';
-            app.UIAxes_2.XTick = [];
-            app.UIAxes_2.YColor = 'none';
-            app.UIAxes_2.YTick = [];
-            app.UIAxes_2.ZColor = 'none';
-            app.UIAxes_2.GridColor = 'none';
-            app.UIAxes_2.MinorGridColor = 'none';
-            app.UIAxes_2.Position = [21 14 349 251];
 
             % Create UIAxes
             app.UIAxes = uiaxes(app.RightPanel);
@@ -434,7 +431,19 @@ classdef FastDehazeImage_exported < matlab.apps.AppBase
             app.UIAxes.ZColor = 'none';
             app.UIAxes.GridColor = 'none';
             app.UIAxes.MinorGridColor = 'none';
-            app.UIAxes.Position = [21 270 350 245];
+            app.UIAxes.Position = [24 260 338 250];
+
+            % Create UIAxes_2
+            app.UIAxes_2 = uiaxes(app.RightPanel);
+            title(app.UIAxes_2, 'Dehazed (J)')
+            app.UIAxes_2.XColor = 'none';
+            app.UIAxes_2.XTick = [];
+            app.UIAxes_2.YColor = 'none';
+            app.UIAxes_2.YTick = [];
+            app.UIAxes_2.ZColor = 'none';
+            app.UIAxes_2.GridColor = [0.15 0.15 0.15];
+            app.UIAxes_2.MinorGridColor = 'none';
+            app.UIAxes_2.Position = [24 7 338 250];
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
@@ -445,7 +454,7 @@ classdef FastDehazeImage_exported < matlab.apps.AppBase
     methods (Access = public)
 
         % Construct app
-        function app = FastDehazeImage_exported
+        function app = FastDehazeImage
 
             % Create UIFigure and components
             createComponents(app)
