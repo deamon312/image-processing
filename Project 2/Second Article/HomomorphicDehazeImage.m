@@ -125,14 +125,13 @@ classdef HomomorphicDehazeImage < matlab.apps.AppBase
             for i = 1:3
                 app.I_defog(:,:,i) = app.imageData(:,:,i).*app.I_gray_defog;
             end
-            app.I_defog = rescale(app.I_defog);
 
             imshow(app.I_defog, 'Parent', app.UIAxes_2);
             [height, width, ~] = size(app.I_defog);
             app.UIAxes_2.XLim = [0 width];
             app.UIAxes_2.YLim = [0 height];
             if strcmp(app.Dehazed_RGBSwitch.Value,'On')
-               figure,imshow(app.I_defog),title('Dehazed');
+               figure,imshow(app.I_defog,[]),title('Dehazed');
             end 
   
             %%
