@@ -1,4 +1,4 @@
-classdef HomomorphicDehazeImage < matlab.apps.AppBase
+classdef Homomorphic_Image_Dehaze < matlab.apps.AppBase
 
     % Properties that correspond to app components
     properties (Access = public)
@@ -77,7 +77,7 @@ classdef HomomorphicDehazeImage < matlab.apps.AppBase
     methods (Access = private)
 
         % Button pushed function: SelectImageButton
-        function SelectImageButtonPushed(app, event)
+        function SelectImageButtonPushed(app, ~)
 
             close all;
 
@@ -105,7 +105,7 @@ classdef HomomorphicDehazeImage < matlab.apps.AppBase
         end
 
         % Button pushed function: RunButton
-        function RunButtonPushed(app, event)
+        function RunButtonPushed(app, ~)
             close all;
             %%
             [app.I_gray_defog ,If,G_I_FFT] = homomorphic_filter(app.I_gray,app.H);
@@ -125,7 +125,6 @@ classdef HomomorphicDehazeImage < matlab.apps.AppBase
             for i = 1:3
                 app.I_defog(:,:,i) = app.imageData(:,:,i).*app.I_gray_defog;
             end
-
             imshow(app.I_defog, 'Parent', app.UIAxes_2);
             [height, width, ~] = size(app.I_defog);
             app.UIAxes_2.XLim = [0 width];
@@ -149,7 +148,7 @@ classdef HomomorphicDehazeImage < matlab.apps.AppBase
         % Callback function: CEditField, D0EditField, GausHPTab, GausHPTab,
         % 
         % ...and 2 other components
-        function GausHPTabButtonDown(app, event)
+        function GausHPTabButtonDown(app, ~)
           gL = app.gLEditField.Value;
           gH = app.gHEditField.Value;
           C  = app.CEditField.Value;
@@ -160,7 +159,7 @@ classdef HomomorphicDehazeImage < matlab.apps.AppBase
 
         % Callback function: ButterHPTab, ButterHPTab, D0EditField_2, 
         % ...and 1 other component
-        function ButterHPTabButtonDown(app, event)
+        function ButterHPTabButtonDown(app, ~)
           n  = app.NEditField.Value;
           D0 = app.D0EditField_2.Value;
           app.H = butterhp(app.I_gray, D0,n);
@@ -168,25 +167,25 @@ classdef HomomorphicDehazeImage < matlab.apps.AppBase
         end
 
         % Callback function: D0EditField_3, IdealHPTab, IdealHPTab
-        function IdealHPTabButtonDown(app, event)
+        function IdealHPTabButtonDown(app, ~)
           D0 = app.D0EditField_3.Value;
           app.H = idealhp(app.I_gray, D0);
           app.Update_H()
         end
 
         % Button pushed function: DispSelectedFilterButton
-        function DispSelectedFilterButtonPushed(app, event)
+        function DispSelectedFilterButtonPushed(app, ~)
             close all;
             plotTFSurface(app.H);
         end
 
         % Button pushed function: HistogramButton
-        function HistogramButtonPushed(app, event)
+        function HistogramButtonPushed(app, ~)
             figure;imhist(app.I_gray);title('Histogram');
         end
 
         % Changes arrangement of the app based on UIFigure width
-        function updateAppLayout(app, event)
+        function updateAppLayout(app, ~)
             currentFigureWidth = app.UIFigure.Position(3);
             if(currentFigureWidth <= app.onePanelWidth)
                 % Change to a 2x1 grid
@@ -481,7 +480,7 @@ classdef HomomorphicDehazeImage < matlab.apps.AppBase
     methods (Access = public)
 
         % Construct app
-        function app = HomomorphicDehazeImage
+        function app = Homomorphic_Image_Dehaze
 
             % Create UIFigure and components
             createComponents(app)
